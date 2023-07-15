@@ -1,4 +1,4 @@
-package com.ootdgram.ootdgram.dto;
+package com.ootdgram.ootdgram.domain.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

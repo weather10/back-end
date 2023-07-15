@@ -1,10 +1,13 @@
 package com.ootdgram.ootdgram.controller;
 
-import com.ootdgram.ootdgram.dto.CommentRequestDto;
-import com.ootdgram.ootdgram.dto.CommentResponseDto;
-import com.ootdgram.ootdgram.dto.ResponseDto;
-import com.ootdgram.ootdgram.jwt.JwtUtil;
+import com.ootdgram.ootdgram.domain.dto.CommentRequestDto;
+import com.ootdgram.ootdgram.domain.dto.CommentResponseDto;
+import com.ootdgram.ootdgram.domain.dto.ResponseDto;
+import com.ootdgram.ootdgram.domain.entity.User;
+import com.ootdgram.ootdgram.security.UserDetailsImpl;
+import com.ootdgram.ootdgram.security.jwt.JwtUtil;
 import com.ootdgram.ootdgram.service.CommentService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,22 +23,27 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}/comment")
-    public CommentResponseDto createComment(@PathVariable Long postId, @RequestBody CommentRequestDto commentRequestDto, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-        return commentService.createComment(postId, commentRequestDto, token);
+    public CommentResponseDto createComment(@PathVariable Long postId,
+                                            @RequestBody CommentRequestDto commentRequestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.createComment(postId, commentRequestDto, userDetails.getUser());
     }
 
-    @GetMapping("/{postId}/comment")
-    public List<CommentResponseDto> getComments(@PathVariable Long postId, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-        return commentService.getComments(postId, token);
+    @GetMapping("/{postId}/comments")
+    public List<CommentResponseDto> getComments(@PathVariable Long postId) {
+        return commentService.getComments(postId);
     }
 
     @PatchMapping("/{postId}/comment/{commentId}")
-    public CommentResponseDto updateComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentRequestDto commentRequestDto, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-        return commentService.updateComment(postId, commentId, commentRequestDto, token);
+    public CommentResponseDto updateComment(@PathVariable Long commentId,
+                                            @RequestBody CommentRequestDto commentRequestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.updateComment(commentId, commentRequestDto, userDetails.getUser());
     }
 
     @DeleteMapping("/{postId}/comment/{commentId}")
-    public ResponseDto deleteComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-        return commentService.deleteComment(postId, commentId, token);
+    public ResponseDto deleteComment(@PathVariable Long commentId,
+                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.deleteComment(commentId, userDetails.getUser());
     }
 }

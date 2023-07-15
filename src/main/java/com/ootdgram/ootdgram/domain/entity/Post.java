@@ -12,26 +12,30 @@ import java.util.List;
 @Entity
 @Table(name = "post")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Post extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    @Column(updatable = false, nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long id;
 
     @Column(name = "image", nullable = false)
     private String image;
 
     @Column(name = "content", nullable = false)
     private String content;
-//단방향 user와
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-//    @OrderBy("createdAt DESC")
-//    private List<Comment> commentList= new ArrayList<>();
 
-    public Post(PostRequestDto requestDto) {
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList= new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Post(PostRequestDto requestDto, User user) {
         this.image = requestDto.getImage();
         this.content = requestDto.getContent();
+        this.user = user;
     }
 
     public void update(PostRequestDto requestDto) {

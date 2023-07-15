@@ -7,6 +7,7 @@ import com.ootdgram.ootdgram.security.jwt.JwtUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -61,6 +62,8 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/post/**").permitAll()
                         .anyRequest().authenticated()
         );
 
