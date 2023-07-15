@@ -15,6 +15,6 @@ public class UserController {
     }
 
     public void signup(@RequestBody SignupRequestDto requestDto) {
-        userService.signup();
+        userService.signup(requestDto);
     }
 }
