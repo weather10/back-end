@@ -28,7 +28,7 @@ public class UserService {
             return;
 
         // 사용자 등록
-        User user = new User(requestDto.getName(), email, password);
+        User user = new User(requestDto.getNickname(), email, password);
         userRepository.save(user);
     }
 

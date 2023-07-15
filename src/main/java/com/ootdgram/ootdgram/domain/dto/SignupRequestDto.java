@@ -8,7 +8,7 @@ import lombok.Getter;
 public class SignupRequestDto {
     @NotBlank
     @Pattern(regexp = "^[a-zA-Z0-9]{5,12}$")
-    private String name;
+    private String nickname;
 
     @NotBlank
     @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
