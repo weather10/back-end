@@ -46,4 +46,4 @@ public class CommentController {
                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return commentService.deleteComment(commentId, userDetails.getUser());
     }
-}//test
+}
