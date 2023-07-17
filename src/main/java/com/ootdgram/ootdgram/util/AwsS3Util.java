@@ -28,12 +28,17 @@ public class AwsS3Util {
         this.amazonS3 = amazonS3;
     }
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName) {
         String s3FileName = dirName + "/" + UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
-
         ObjectMetadata objectMeta = new ObjectMetadata();
-        objectMeta.setContentLength(multipartFile.getInputStream().available());
-        amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objectMeta);
+
+        try {
+            objectMeta.setContentLength(multipartFile.getInputStream().available());
+            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objectMeta);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
 
         URL url = amazonS3.getUrl(bucket, s3FileName);
         return url.toString();
@@ -43,5 +48,10 @@ public class AwsS3Util {
         String fileKey = URLDecoder.decode(fileUrl.substring(s3Url.length()));
         log.info(fileKey);
         amazonS3.deleteObject(bucket, fileKey);
+    }
+
+    public String update(MultipartFile multipartFile, String fileUrl, String dirName) {
+        delete(fileUrl);
+        return upload(multipartFile, dirName);
     }
 }
