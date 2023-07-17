@@ -1,10 +1,11 @@
 package com.ootdgram.ootdgram.domain.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
 public class PostRequestDto {
-    private String image;
+    @NotBlank
     private String content;
 
 //    weather 보류
