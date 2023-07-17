@@ -25,6 +25,7 @@ public class UserService {
 
     @Value("${user.default.image}")
     private String defaultUserImageUrl;
+
     public UserService(PasswordEncoder passwordEncoder,
                        UserRepository userRepository,
                        AwsS3Util awsS3Util) {
@@ -46,13 +47,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void update(UpdateRequest requestDto, MultipartFile multipartFile, User user) throws IOException {
+    public void update(UpdateRequest requestDto, MultipartFile multipartFile, User user) {
+        String dirName = "user";
         User findUser = userRepository.findByEmail(user.getEmail()).orElseThrow(
                 () -> new IllegalArgumentException("Illegal")
         );
-        awsS3Util.delete(findUser.getImage());
-        String url = awsS3Util.upload(multipartFile, "user");
-        findUser.update(requestDto, url);
+
+        String updateImageURL = awsS3Util.update(multipartFile, findUser.getImage(), dirName);
+        findUser.update(requestDto, updateImageURL);
     }
     private boolean isEmailDuplicate(String email) {
         Optional<User> checkEmail = userRepository.findByEmail(email);
