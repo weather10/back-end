@@ -29,6 +29,9 @@ public class AwsS3Util {
     }
 
     public String upload(MultipartFile multipartFile, String dirName) {
+        if (multipartFile.isEmpty())
+            return null;
+
         String s3FileName = dirName + "/" + UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
         ObjectMetadata objectMeta = new ObjectMetadata();
 
@@ -45,6 +48,9 @@ public class AwsS3Util {
     }
 
     public void delete(String fileUrl) {
+        if (fileUrl == null)
+            return;
+
         String fileKey = URLDecoder.decode(fileUrl.substring(s3Url.length()));
         log.info(fileKey);
         amazonS3.deleteObject(bucket, fileKey);

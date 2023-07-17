@@ -38,7 +38,10 @@ public class PostService {
     }
 
     public PostResponseDto createPost(PostRequestDto requestDto, MultipartFile multipartFile, User user) {
-        String imageURL = awsS3Util.upload(multipartFile, dirName);
+        String imageURL = null;
+        if (!multipartFile.isEmpty()) {
+            imageURL = awsS3Util.upload(multipartFile, dirName);
+        }
 
         Post post = new Post(requestDto, user, imageURL);
         Post savedPost = postRepository.save(post);
@@ -55,7 +58,9 @@ public class PostService {
 
         isWriterValidation(post, user);
 
+
         String updateImageURL = awsS3Util.update(multipartFile, post.getImage(), dirName);
+
         post.update(requestDto, updateImageURL);
 
         return new PostResponseDto(post);

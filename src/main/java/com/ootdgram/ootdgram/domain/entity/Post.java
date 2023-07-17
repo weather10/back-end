@@ -18,7 +18,7 @@ public class Post extends Timestamped{
     @Column(updatable = false, nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long id;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image")
     private String image;
 
     @Column(name = "content", nullable = false)
