@@ -1,19 +1,17 @@
 package com.ootdgram.ootdgram.controller;
 
-import com.ootdgram.ootdgram.domain.dto.SignupRequestDto;
+import com.ootdgram.ootdgram.security.UserDetailsImpl;
 import com.ootdgram.ootdgram.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
+
+import static com.ootdgram.ootdgram.domain.dto.UserDto.SignupRequest;
+import static com.ootdgram.ootdgram.domain.dto.UserDto.UpdateRequest;
 
 @Slf4j(topic = "Signup")
 @RestController
@@ -27,15 +25,15 @@ public class UserController {
     }
 
     @PostMapping("/auth/signup")
-    public void signup(@RequestBody @Valid SignupRequestDto requestDto, BindingResult bindingResult) {
-        // 예외처리
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if (fieldErrors.size() > 0) {
-            for (FieldError fieldError : fieldErrors) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-            }
-            return;
-        }
+    public void signup(@RequestBody @Valid SignupRequest requestDto)  {
         userService.signup(requestDto);
+    }
+
+    @PatchMapping("/auth/update")
+    public void updateUser(@RequestPart("data") @Valid UpdateRequest requestDto,
+                           @RequestPart("image") MultipartFile multipartFile,
+                           @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+
+        userService.update(requestDto, multipartFile, userDetails.getUser());
     }
 }
