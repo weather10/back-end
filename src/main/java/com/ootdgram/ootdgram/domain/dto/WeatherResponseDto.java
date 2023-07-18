@@ -1,15 +1,15 @@
 package com.ootdgram.ootdgram.domain.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
+//@Builder
 public class WeatherResponseDto {
     private Coord coord;
-    private List<Weather> weather;
+//    private List<Weather> weather;
     private String base;
     private Main main;
     private long visibility;
@@ -23,25 +23,19 @@ public class WeatherResponseDto {
     private long cod;
 
     // Constructors, getters, setters, etc.
-
     @Getter
-    @Setter
     public static class Coord {
         private double lon;
         private double lat;
     }
-
     @Getter
-    @Setter
     public static class Weather {
         private long id;
         private String main;
         private String description;
         private String icon;
     }
-
     @Getter
-    @Setter
     public static class Main {
         private double temp;
         private double feels_like;
@@ -52,20 +46,17 @@ public class WeatherResponseDto {
     }
 
     @Getter
-    @Setter
     public static class Wind {
         private double speed;
         private long deg;
     }
-
     @Getter
-    @Setter
+
     public static class Clouds {
         private long all;
     }
 
     @Getter
-    @Setter
     public static class Sys {
         private long type;
         private long id;

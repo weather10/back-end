@@ -21,7 +21,7 @@ public class Post extends Timestamped{
     @Column(name = "image")
     private String image;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 500)
     private String content;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
