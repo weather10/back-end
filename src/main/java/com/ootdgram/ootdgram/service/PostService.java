@@ -57,8 +57,6 @@ public class PostService {
         Post post = findPost(postId);
 
         isWriterValidation(post, user);
-
-
         String updateImageURL = awsS3Util.update(multipartFile, post.getImage(), dirName);
 
         post.update(requestDto, updateImageURL);

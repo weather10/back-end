@@ -36,9 +36,7 @@ public class CommentService {
     public List<CommentResponseDto> getComments(Long postId) {
         Post findPost = findPost(postId);
 
-        List<CommentResponseDto> findCommentListByPost = findPost.getCommentList().stream().map(CommentResponseDto::new).toList();
-
-        return findCommentListByPost;
+        return findPost.getCommentList().stream().map(CommentResponseDto::new).toList();
     }
 
     public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, User user) {

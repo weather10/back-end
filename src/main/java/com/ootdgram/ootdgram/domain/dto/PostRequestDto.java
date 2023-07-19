@@ -8,5 +8,6 @@ public class PostRequestDto {
     @NotBlank
     private String content;
 
-//    weather 보류
+    @NotBlank
+    private String weather;
 }

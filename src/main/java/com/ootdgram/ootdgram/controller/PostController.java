@@ -5,6 +5,7 @@ import com.ootdgram.ootdgram.domain.dto.PostResponseDto;
 import com.ootdgram.ootdgram.domain.dto.ResponseDto;
 import com.ootdgram.ootdgram.security.UserDetailsImpl;
 import com.ootdgram.ootdgram.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class PostController {
     }
     //    게시글 작성 	POST	/api/post
     @PostMapping("/post")
-    public PostResponseDto createPost(@RequestPart("data") PostRequestDto requestDto,
+    public PostResponseDto createPost(@RequestPart("data") @Valid PostRequestDto requestDto,
                                       @RequestPart("image") MultipartFile multipartFile,
                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return postService.createPost(requestDto, multipartFile, userDetails.getUser());
@@ -42,7 +43,7 @@ public class PostController {
     //    게시글 수정	Put	/api/post/{id}
     @PatchMapping("/post/{postId}")
     public PostResponseDto updatePost(@PathVariable Long postId,
-                                      @RequestPart("data") PostRequestDto requestDto,
+                                      @RequestPart("data") @Valid PostRequestDto requestDto,
                                       @RequestPart("image") MultipartFile multipartFile,
                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         return postService.updatePost(postId, requestDto, multipartFile,userDetails.getUser());

@@ -20,11 +20,14 @@ public class Post extends Timestamped{
     @Column(updatable = false, nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long id;
 
-    @Column(name = "image")
+    @Column(name = "image", nullable = false)
     private String image;
 
     @Column(name = "content", nullable = false, length = 500)
     private String content;
+
+    @Column(name = "weather", nullable = false)
+    private String weather;
 
     @Column(name = "love_count", nullable = false)
     @ColumnDefault("0")
@@ -41,6 +44,7 @@ public class Post extends Timestamped{
         this.content = requestDto.getContent();
         this.user = user;
         this.image = imageURL;
+        this.weather = requestDto.getWeather();
     }
 
     public void update(PostRequestDto requestDto, String imageURL) {

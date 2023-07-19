@@ -27,7 +27,4 @@ public class Love {
         this.post = post;
         this.user = user;
     }
-
-
-
 }
