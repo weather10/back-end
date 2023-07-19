@@ -4,10 +4,8 @@ package com.ootdgram.ootdgram.service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.ootdgram.ootdgram.domain.dto.ForecastWeatherResponseDto;
 import com.ootdgram.ootdgram.domain.dto.WeatherResponseDto;
-import com.ootdgram.ootdgram.domain.dto.CurrentWeatherResponseDto;
+import com.ootdgram.ootdgram.util.ApiUtill;
 import com.ootdgram.ootdgram.util.WeatherUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,111 +13,68 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
+import static com.ootdgram.ootdgram.domain.dto.WeatherResponseDto.*;
 
 @Slf4j(topic = "OpenWeather API")
 @Service
 public class WeatherService {
     private final WebClient webClient;
+    private final WeatherUtil weatherUtil;
+    private final ApiUtill apiUtill;
 
-    @Value("${api.openweather.key}")
-    private String API_KEY; // OpenWeatherMap API 키
-
-    public WeatherService(WebClient webClient) {
+    public WeatherService(WebClient webClient, WeatherUtil weatherUtil, ApiUtill apiUtill) {
         this.webClient = webClient;
+        this.weatherUtil = weatherUtil;
+        this.apiUtill = apiUtill;
     }
-
-    public WeatherResponseDto getWeather1(double latitude, double longitude) {
-        String currnetWeatherString = getCurrentWeather(latitude, longitude);
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = (JsonObject) parser.parse(currnetWeatherString);
-        log.info(jsonObject.getAsJsonArray("weather").toString());
-        log.info("기상상태 = " + jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("main").getAsString());
-        log.info("풍속 = " + jsonObject.getAsJsonObject("wind").get("speed").getAsDouble());
-        log.info("강수량 = " + jsonObject.getAsJsonObject("rain").get("1h").getAsDouble());
-        log.info("온도 = " + jsonObject.getAsJsonObject("main").get("temp").getAsDouble());
-        log.info("습도 = " + jsonObject.getAsJsonObject("main").get("humidity").getAsDouble());
-        log.info("dt = " + WeatherUtil.convertTimestamp(jsonObject.get("dt").getAsDouble()));
-        return null;
-    }
-
-    //   test용
     public WeatherResponseDto getWeather(double latitude, double longitude) {
-        String forecastWeatherString = getForecastWeather(latitude, longitude);
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = (JsonObject) parser.parse(forecastWeatherString);
-//        log.info(jsonObject.getAsJsonArray("list").toString()); // 너무 길어서 // 현채 cnt  =24 // 3시간 간격 3일치
-        JsonArray jsonArray =  jsonObject.getAsJsonArray("list");
+        String forecastWeatherString = apiUtill.getForecastWeather(latitude, longitude);
+        String currentWeather = apiUtill.getCurrentWeather(latitude, longitude);
+        String address = getGeo(latitude, longitude);
 
-        Map<LocalDate, List<Double>> temperatureMap = new HashMap<>();
+        // 날씨 예보 관련
+        JsonObject forecastWeatherJsonObject = weatherUtil.stringToJsonObject(forecastWeatherString);
+        JsonArray jsonArray = forecastWeatherJsonObject.getAsJsonArray("list");
+        List<ForecastWeatherDto> forecastWeatherDtos = weatherUtil.getForecastWeatherDtos(jsonArray);
 
-        for (JsonElement element : jsonArray) {
-            JsonObject forecastObject = element.getAsJsonObject();
-            double temperature = forecastObject.getAsJsonObject("main").get("temp").getAsDouble();
-            LocalDateTime dateTime = WeatherUtil.convertTimestamp(forecastObject.get("dt").getAsDouble());
-            LocalDate date = dateTime.toLocalDate();
+        // 현재 날시 관련
+        JsonObject currentWeatherJsonObject = weatherUtil.stringToJsonObject(currentWeather);
+        JsonElement main = currentWeatherJsonObject.getAsJsonObject().get("main");
+        double temp = main.getAsJsonObject().get("temp").getAsDouble();
+        int humidity = main.getAsJsonObject().get("humidity").getAsInt();
+        String weatherStatus = currentWeatherJsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("main").getAsString();
+        double windSpeed = currentWeatherJsonObject.getAsJsonObject().get("wind").getAsJsonObject().get("speed").getAsDouble();
 
-            if (!temperatureMap.containsKey(date)) {
-                temperatureMap.put(date, new ArrayList<>());
-            }
-            temperatureMap.get(date).add(temperature);
+        LocalDateTime dateTime = weatherUtil.convertTimestamp(currentWeatherJsonObject.getAsJsonObject().get("dt").getAsLong());
+        double precipitation = 0.0;
+        if (currentWeatherJsonObject.has("rain")) {
+            precipitation = currentWeatherJsonObject.getAsJsonObject("rain").get("1h").getAsDouble();
         }
 
-        for (LocalDate date : temperatureMap.keySet()) {
-            List<Double> temperatures = temperatureMap.get(date);
-            double averageTemperature = temperatures.stream()
-                    .mapToDouble(Double::doubleValue)
-                    .average()
-                    .orElse(0.0);
-
-            log.info("날짜 = " + date);
-            log.info("평균 온도 = " + String.format("%.1f", averageTemperature));
-        }
-
-        return null;
-    }
-    private String getForecastWeather(double latitude, double longitude) {
-        String API_URL = "https://api.openweathermap.org/data/2.5/forecast";
-
-        String apiUrl = UriComponentsBuilder.fromUriString(API_URL)
-                .queryParam("lat", latitude)
-                .queryParam("lon", longitude)
-                .queryParam("lang", "kr")
-                .queryParam("cnt", "24")
-                .queryParam("appid", API_KEY)
-                .queryParam("units", "metric")
-                .build()
-                .toUriString();
-
-        return webClient.get()
-                .uri(apiUrl)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        return WeatherResponseDto.builder()
+                .forecastWeatherList(forecastWeatherDtos)
+                .currentTemperature(temp)
+                .weatherStatus(weatherStatus)
+                .windSpeed(windSpeed)
+                .dateTime(dateTime)
+                .precipitation(precipitation)
+                .humidity(humidity)
+                .address(address)
+                .build();
     }
 
-    private String getCurrentWeather(double latitude, double longitude) {
-        String API_URL = "https://api.openweathermap.org/data/2.5/weather";
-
-        String apiUrl = UriComponentsBuilder.fromUriString(API_URL)
-                .queryParam("lat", latitude)
-                .queryParam("lon", longitude)
-                .queryParam("lang", "kr")
-                .queryParam("appid", API_KEY)
-                .queryParam("units","metric")
-                .build()
-                .toUriString();
-
-        return webClient.get()
-                .uri(apiUrl)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+    public String getGeo(double latitude, double longitude) {
+        String geoString = apiUtill.geocoding(latitude, longitude);
+        JsonObject jsonObject = weatherUtil.stringToJsonObject(geoString).getAsJsonObject();
+        JsonObject response = jsonObject.getAsJsonObject("response");
+        JsonArray results = response.getAsJsonArray("result");
+        JsonObject firstResult = results.get(0).getAsJsonObject();
+        String address = firstResult.get("text").getAsString();
+        log.info("Address: " + address);
+        return address;
     }
-
 }
