@@ -1,9 +1,11 @@
 package com.ootdgram.ootdgram.domain.entity;
 
+import com.ootdgram.ootdgram.domain.dto.LoveRequestDto;
 import com.ootdgram.ootdgram.domain.dto.PostRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,10 @@ public class Post extends Timestamped{
     @Column(name = "content", nullable = false, length = 500)
     private String content;
 
+    @Column(name = "love_count", nullable = false)
+    @ColumnDefault("0")
+    private int loveCount;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList= new ArrayList<>();
 
@@ -40,5 +46,13 @@ public class Post extends Timestamped{
     public void update(PostRequestDto requestDto, String imageURL) {
         this.content = requestDto.getContent();
         this.image = imageURL;
+    }
+
+    public void updateLoveCount(LoveRequestDto requestDto) {
+        if (requestDto.isLove()) {
+            this.loveCount++;
+        } else {
+            this.loveCount--;
+        }
     }
 }
