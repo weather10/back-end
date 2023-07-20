@@ -24,6 +24,9 @@ public class AwsS3Util {
     @Value("${s3.url}")
     private String s3Url;
 
+    @Value("${user.default.image}")
+    private String defaultUserImageUrl;
+
     public AwsS3Util(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
     }
@@ -57,7 +60,8 @@ public class AwsS3Util {
     }
 
     public String update(MultipartFile multipartFile, String fileUrl, String dirName) {
-        delete(fileUrl);
+        if (!fileUrl.equals(defaultUserImageUrl))
+            delete(fileUrl);
         return upload(multipartFile, dirName);
     }
 }
