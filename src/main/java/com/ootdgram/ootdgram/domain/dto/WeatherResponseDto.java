@@ -1,76 +1,44 @@
 package com.ootdgram.ootdgram.domain.dto;
 
+//import com.ootdgram.ootdgram.util.WeatherUtil;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
+@Builder
 public class WeatherResponseDto {
-    private Coord coord;
-    private List<Weather> weather;
-    private String base;
-    private Main main;
-    private long visibility;
-    private Wind wind;
-    private Clouds clouds;
-    private long dt;
-    private Sys sys;
-    private long timezone;
-    private long id;
-    private String name;
-    private long cod;
+    // 현재 온도
+    private double currentTemperature;
+    // 기상상태
+    private String weatherStatus;
+    // 습도
+    private double humidity;
+    // 풍속
+    private double windSpeed;
+    // 주소 //Geocoding API
+    private String address;
+    // 강수량
+    private double precipitation;
+    // 날짜
+    private LocalDateTime dateTime;
+    // 예보 날씨 list
+    private List<ForecastWeatherDto> forecastWeatherList;
 
-    // Constructors, getters, setters, etc.
-
-    @Getter
-    @Setter
-    public static class Coord {
-        private double lon;
-        private double lat;
-    }
 
     @Getter
-    @Setter
-    public static class Weather {
-        private long id;
-        private String main;
-        private String description;
-        private String icon;
-    }
-
-    @Getter
-    @Setter
-    public static class Main {
+    public static class ForecastWeatherDto {
         private double temp;
-        private double feels_like;
-        private double temp_min;
-        private double temp_max;
-        private long pressure;
-        private long humidity;
-    }
+        private String weatherStatus;
+        private LocalDateTime dateTime;
 
-    @Getter
-    @Setter
-    public static class Wind {
-        private double speed;
-        private long deg;
-    }
-
-    @Getter
-    @Setter
-    public static class Clouds {
-        private long all;
-    }
-
-    @Getter
-    @Setter
-    public static class Sys {
-        private long type;
-        private long id;
-        private String country;
-        private long sunrise;
-        private long sunset;
+        public ForecastWeatherDto(double temp, String weatherStatus, LocalDateTime dateTime) {
+            this.temp = temp;
+            this.weatherStatus = weatherStatus;
+            this.dateTime = dateTime;
+        }
     }
 }

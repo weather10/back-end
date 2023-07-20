@@ -14,12 +14,4 @@ public class LoginRequestDto {
     @NotEmpty
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,21}$")
     private String password;
-
-    @NotEmpty
-    @Size(max = 90, min = -90)
-    private double latitude;
-
-    @NotEmpty
-    @Size(max = 180, min = -180)
-    private double longitude;
 }

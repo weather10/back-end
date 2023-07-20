@@ -5,7 +5,7 @@ import com.ootdgram.ootdgram.service.WeatherService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/weather")
+@RequestMapping("/api")
 public class WeatherController {
 
     private final WeatherService weatherService;
@@ -13,7 +13,7 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping("/{latitude}/{longitude}")
+    @GetMapping("/weather/{latitude}/{longitude}")
     public WeatherResponseDto getWeather(@PathVariable double latitude, @PathVariable double longitude) {
         return weatherService.getWeather(latitude, longitude);
     }

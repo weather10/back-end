@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.ootdgram.ootdgram.domain.dto.UserDto.UpdateRequest;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -22,9 +24,19 @@ public class User extends Timestamped{
     @Column(nullable = false, unique = true)
     private String email;
 
-    public User(String nickname, String email, String password) {
+
+    @Column(nullable = false)
+    private String image;
+
+    public User(String nickname, String email, String password, String imageUrl) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.image = imageUrl;
+    }
+
+    public void update(UpdateRequest requestDto, String url) {
+        this.nickname = requestDto.getNickname();
+        this.image = url;
     }
 }

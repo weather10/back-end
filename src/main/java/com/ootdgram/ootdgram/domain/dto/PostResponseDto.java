@@ -15,15 +15,19 @@ public class PostResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private List<CommentResponseDto> commentList;
     private String nickname;
+    private String userImage;
+    private String weather;
+    private int loveCount;
     public PostResponseDto(Post post){
         this.id = post.getId();
         this.image = post.getImage();
         this.content = post.getContent();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.commentList = post.getCommentList().stream().map(CommentResponseDto::new).toList();
         this.nickname = post.getUser().getNickname();
+        this.userImage = post.getUser().getImage();
+        this.weather = post.getWeather();
+        this.loveCount = post.getLoveCount();
     }
 }
